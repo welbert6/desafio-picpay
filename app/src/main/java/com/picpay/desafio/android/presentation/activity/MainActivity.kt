@@ -31,6 +31,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         binding.recyclerView.adapter = adapter
         observeViewModel()
+        viewModel.fetchUsers()
     }
 
     private fun observeViewModel() {

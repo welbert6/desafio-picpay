@@ -1,44 +1,47 @@
 package com.picpay.desafio.android.presentation
 
-
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.picpay.desafio.android.domain.model.User
 import com.picpay.desafio.android.domain.usecase.GetUsersUseCase
+import com.picpay.desafio.android.domain.util.Result
 import com.picpay.desafio.android.presentation.userlist.UserListViewModel
 import com.picpay.desafio.android.presentation.userlist.UserUiState
-import io.mockk.coEvery
-import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.*
+import kotlinx.coroutines.NonCancellable.cancel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.setMain
 import org.junit.After
-import org.junit.Assert.assertEquals
+import org.junit.Assert.*
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.TestRule
 
 /**
- * Created by Welbert on 01/06/2025
+ * Created by Welbert on 02/06/2025
  */
-
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class UserListViewModelTest {
 
-    @get:Rule
-    val rule: TestRule = InstantTaskExecutorRule()
-
-    private val testDispatcher = UnconfinedTestDispatcher()
-    private val testScope = TestScope(testDispatcher)
-
-    private lateinit var getUsersUseCase: GetUsersUseCase
     private lateinit var viewModel: UserListViewModel
+    private lateinit var fakeUseCase: FakeGetUsersUseCase
+    private lateinit var testScope: TestScope
+
+    private val testDispatcher = StandardTestDispatcher()
+    private val mockedUser = User(1, "Welbert", "Moreira", "img.jpg")
 
     @Before
-    fun setUp() {
+    fun setup() {
         Dispatchers.setMain(testDispatcher)
-        getUsersUseCase = mockk()
+        fakeUseCase = FakeGetUsersUseCase(Result.Success(listOf(mockedUser)))
+        testScope = TestScope(testDispatcher)
+        viewModel = UserListViewModel(fakeUseCase)
     }
 
     @After
@@ -47,29 +50,58 @@ class UserListViewModelTest {
     }
 
     @Test
-    fun `fetchUsers should emit Success on success`() = testScope.runTest {
-        val userList = listOf(User(1, "Welbert", "Moreira", "img.jpg"))
-        coEvery { getUsersUseCase(any()) } returns userList
+    fun `should emit Loading then Success`() = testScope.runTest {
+        val emissions = mutableListOf<UserUiState>()
 
-        viewModel = UserListViewModel(getUsersUseCase)
+        val job = launch {
+            viewModel.uiState.collect {
+                emissions.add(it)
+                if (it is UserUiState.Success)
+                    cancel()
+            }
+        }
 
+        viewModel.fetchUsers()
         advanceUntilIdle()
 
-        val result = viewModel.uiState.value
-        assert(result is UserUiState.Success)
-        assertEquals(userList, (result as UserUiState.Success).users)
+        assertEquals(UserUiState.Loading, emissions[0])
+        assertTrue(emissions.last() is UserUiState.Success)
+
+        val success = emissions.last() as UserUiState.Success
+        assertEquals(1, success.users.size)
+        assertEquals("Welbert", success.users[0].name)
+
+        job.cancel()
     }
 
     @Test
-    fun `fetchUsers should emit Error on exception`() = testScope.runTest {
-        coEvery { getUsersUseCase(any()) } throws RuntimeException("Erro")
+    fun `should emit Loading then Error`() = testScope.runTest {
+        fakeUseCase.result = Result.Error(Unit)
+        val emissions = mutableListOf<UserUiState>()
 
-        viewModel = UserListViewModel(getUsersUseCase)
+        val job = launch {
+            viewModel.uiState.collect {
+                emissions.add(it)
+                if (it is UserUiState.Error) cancel()
+            }
+        }
 
+        viewModel.fetchUsers()
         advanceUntilIdle()
 
-        val result = viewModel.uiState.value
-        assert(result is UserUiState.Error)
-        assertEquals("Erro ao carregar usuários", (result as UserUiState.Error).message)
+        assertEquals(UserUiState.Loading, emissions[0])
+        assertTrue(emissions.last() is UserUiState.Error)
+
+        val error = emissions.last() as UserUiState.Error
+        assertEquals("Erro ao carregar usuários", error.message)
+
+        job.cancel()
+    }
+
+    // Fake UseCase
+    private class FakeGetUsersUseCase(var result: Result<List<User>, Unit>) : GetUsersUseCase {
+        override fun invoke(forceRefresh: Boolean): Flow<Result<List<User>, Unit>> = flow {
+            emit(result)
+        }
     }
 }

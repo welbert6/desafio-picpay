@@ -3,6 +3,7 @@ package com.picpay.desafio.android.presentation.userlist
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.picpay.desafio.android.domain.usecase.GetUsersUseCase
+import com.picpay.desafio.android.domain.util.Result
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -18,18 +19,16 @@ class UserListViewModel(
     private val _uiState = MutableStateFlow<UserUiState>(UserUiState.Loading)
     val uiState: StateFlow<UserUiState> = _uiState
 
-    init {
-        fetchUsers()
-    }
-
     fun fetchUsers(forceRefresh: Boolean = false) {
+        _uiState.value = UserUiState.Loading
         viewModelScope.launch {
-            try {
-                _uiState.value = UserUiState.Loading
-                val users = getUsersUseCase(forceRefresh)
-                _uiState.value = UserUiState.Success(users)
-            } catch (e: Exception) {
-                _uiState.value = UserUiState.Error("Erro ao carregar usuários")
+            getUsersUseCase(forceRefresh).collect {
+                when (it) {
+                    is Result.Error -> _uiState.value =
+                        UserUiState.Error("Erro ao carregar usuários")
+
+                    is Result.Success -> _uiState.value = UserUiState.Success(it.data)
+                }
             }
         }
     }
