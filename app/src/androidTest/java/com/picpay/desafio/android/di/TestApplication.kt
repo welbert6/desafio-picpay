@@ -9,6 +9,7 @@ import com.picpay.desafio.android.data.api.PicPayService
 import com.picpay.desafio.android.data.repository.UserRepositoryImpl
 import com.picpay.desafio.android.domain.repository.UserRepository
 import com.picpay.desafio.android.domain.usecase.GetUsersUseCase
+import com.picpay.desafio.android.domain.usecase.GetUsersUseCaseImpl
 import retrofit2.converter.gson.GsonConverterFactory
 import com.picpay.desafio.android.presentation.userlist.UserListViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -29,7 +30,7 @@ val testModules =  module {
     }
     single { get<Retrofit>().create(PicPayService::class.java) }
     single<UserRepository> { UserRepositoryImpl(get()) }
-    factory { GetUsersUseCase(get()) }
+    factory<GetUsersUseCase> { GetUsersUseCaseImpl(repository =  get()) }
     viewModel { UserListViewModel(get()) }
 }
 
