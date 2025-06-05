@@ -25,8 +25,8 @@ class UserListViewModel(
         viewModelScope.launch {
             getUsersUseCase(forceRefresh).collect {
                 when (it) {
-                    is Result.Error -> _uiState.value =
-                        UserUiState.Error("Erro ao carregar usuários")
+                    is Result.Error ->  _uiState.value =
+                        UserUiState.Error("Erro ao carregar usuários" )
 
                     is Result.Success -> _uiState.value = UserUiState.Success(it.data)
                 }
