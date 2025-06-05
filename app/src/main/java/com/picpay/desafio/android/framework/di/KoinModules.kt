@@ -5,7 +5,7 @@ import com.picpay.desafio.android.data.repository.UserRepositoryImpl
 import com.picpay.desafio.android.domain.repository.UserRepository
 import com.picpay.desafio.android.domain.usecase.GetUsersUseCase
 import com.picpay.desafio.android.domain.usecase.GetUsersUseCaseImpl
-import com.picpay.desafio.android.presentation.userlist.UserListViewModel
+import com.picpay.desafio.android.presentation.viewmodel.UserListViewModel
 import okhttp3.OkHttpClient
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module

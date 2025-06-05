@@ -3,8 +3,8 @@ package com.picpay.desafio.android.presentation
 import com.picpay.desafio.android.domain.model.User
 import com.picpay.desafio.android.domain.usecase.GetUsersUseCase
 import com.picpay.desafio.android.domain.util.Result
-import com.picpay.desafio.android.presentation.userlist.UserListViewModel
-import com.picpay.desafio.android.presentation.userlist.UserUiState
+import com.picpay.desafio.android.presentation.viewmodel.UserListViewModel
+import com.picpay.desafio.android.presentation.state.UserUiState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.NonCancellable.cancel

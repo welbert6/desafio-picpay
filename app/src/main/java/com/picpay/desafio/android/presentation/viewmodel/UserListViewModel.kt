@@ -1,9 +1,10 @@
-package com.picpay.desafio.android.presentation.userlist
+package com.picpay.desafio.android.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.picpay.desafio.android.domain.usecase.GetUsersUseCase
 import com.picpay.desafio.android.domain.util.Result
+import com.picpay.desafio.android.presentation.state.UserUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch

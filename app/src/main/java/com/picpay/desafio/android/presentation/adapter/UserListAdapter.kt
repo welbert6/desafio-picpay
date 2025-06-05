@@ -1,4 +1,4 @@
-package com.picpay.desafio.android.presentation.userlist
+package com.picpay.desafio.android.presentation.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

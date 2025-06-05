@@ -9,9 +9,9 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.picpay.desafio.android.domain.model.User
 import com.picpay.desafio.android.presentation.extensions.hide
 import com.picpay.desafio.android.presentation.extensions.show
-import com.picpay.desafio.android.presentation.userlist.UserListAdapter
-import com.picpay.desafio.android.presentation.userlist.UserListViewModel
-import com.picpay.desafio.android.presentation.userlist.UserUiState
+import com.picpay.desafio.android.presentation.adapter.UserListAdapter
+import com.picpay.desafio.android.presentation.viewmodel.UserListViewModel
+import com.picpay.desafio.android.presentation.state.UserUiState
 import com.picpay.desafio.databinding.ActivityMainBinding
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -49,10 +49,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun showData(listUsers: List<User>) {
+    private fun showData(users: List<User>) {
         binding.progressBar.hide()
         binding.recyclerView.show()
-        adapter.users = listUsers
+        adapter.users = users
     }
 
     private fun showError(message: String) {

@@ -2,7 +2,6 @@ package com.picpay.desafio.android.framework.di
 
 import com.picpay.desafio.android.domain.repository.UserRepository
 import com.picpay.desafio.android.domain.usecase.GetUsersUseCase
-import com.picpay.desafio.android.presentation.userlist.UserListViewModel
 import org.junit.After
 import org.junit.Assert.assertNotNull
 import org.junit.Before
